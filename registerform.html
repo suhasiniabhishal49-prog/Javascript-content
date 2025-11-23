@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register</title>
+</head>
+<body>
+    <div style="margin: 0px 40%;">
+    <form id="regform">
+    
+        <div>
+            <input type="text" placeholder="Enter your username" id="username"/>
+     </div>
+     <div>
+            <input type="email" placeholder="Enter your email" id="email"/>
+    </div>
+    <div>
+        <input type="password" placeholder="Enter your password" id="pass1"/>
+    </div>
+    <div>
+        <input type="password" placeholder="Enter your confirm password" id="pass2"/>
+    </div>
+    <div>
+        <input type="submit" value="Register"/>
+    </div>
+    </div>
+     </form>
+     <script>
+        myformdata = document.getElementById("regform");
+        regform.addEventListener("submit", function(event){
+            event.preventDefault();
+            var uname = document.getElementById("username").value;
+            var email = document.getElementById("email").value;
+            var pass1 = document.getElementById("pass1").value;
+            var pass2 = document.getElementById("pass2").value;
+            if(pass1 == pass2)
+            var data = {
+                username: uname,
+                email: email,
+                pass1: pass1,
+                pass2: pass2,
+            }
+            console.log(data);
+            {username,username,email,data.psss1,data.pass2}
+            document.getElementById("userdetails").innerText = data2
+        });
+            
+     </script>
+
+</body>
+</html>

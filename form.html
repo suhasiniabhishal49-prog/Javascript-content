@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <form id="myform">
+    <h1>calculating of two numbers</h1>
+    <div>
+    <input type="text" placeholder="enter the value" id ="value 1">
+    </div>
+    <div style="padding-top: 10px;">
+    <input type="text" placeholder="enter the value" id ="value 2">
+    </div>
+    <div style="padding-top: 20px;">
+        <br><br>
+    <input type="submit" value="get sum"/>
+    </div>
+</form>
+<br><br>
+the sum of the value1 and value2 is
+
+<p id = "get data"></p>
+<script>
+    var formdata = document.getElementById("myform");
+    formdata.addEventListener("submit", function(event){
+        event.preventDefault ();
+        var val1 = Number(document.getElementById("value 1").value);
+        var val2 = Number(document.getElementById("value 2").value);
+        var sum = val1 + val2;
+        document.getElementById("get data").innerText = sum;
+        alert("sum of two numbers is:" + sum);
+        event.preventDefault();
+        document.getElementById("get data").innerText = sum;
+    });
+</script>
+</body>
+</html>

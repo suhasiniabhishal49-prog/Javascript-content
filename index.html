@@ -5,21 +5,118 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>JAVASCRIPT</title>
     <script>
-        document.write("hello world");
-        console.log("Hello world");
-        alert("hello woeld");
-        var a = 85
-        var a = 50
-        console.log("A value is",a)
-        let b=40
-        const c = 50
-        console.log("B value is",b)
-        console.log("C value is",c)
+        // document.write("hello world");
+        // console.log("Hello world");
+        // alert("hello woeld");
+        // var a = 85
+        // var a = 50
+        // console.log("A value is",a)
+        // let b=40
+        // const c = 50
+        // console.log("B value is",b)
+        // console.log("C value is",c)
+        // //data types in javascript
+        // //primitive data types
+        // //1. string data type
+        // name = "suhasini";
+        // console.log(typeof(name))
+        // //2. object data type
+        // e = null;
+        // console.log(typeof(e))
+        // //3. nymber data type
+        // num=100;
+        // console.log(typeof (num))
+        // //4.boloean data type
+        // bool=true;
+        // console.log(typeof bool)
+        // //5. undefined data type
+        // f = undefined;
+        // console.log(typeof(f))
+        // //hoisting: to declare the code at the top
+        // //console.log(fullname)
+        // //fullname = "hello welcomr to the javascript"
+        // non-primitive data types
+        // data=[1,"one",23,null,true]
+        // console.log(typeof data)
+
+        // products={
+        //     title:"laptop",
+        //     config:"Windows 11",
+        //     prize:"85000",
+        //     color:"black"
+        // }
+        // console.log(products)
+        // console.log(typeof products)
+        //sales=[23000,12344,56987,45000]
+       // console.log(sales[2])
+        //console.log(sales)
+       // spreaad the operator ...
+        //console.log(...sales)
+        //console.log(sales.slice(-1))
+        //discount = sales.map(a)=>a.sales*0.30)
+        //console.log(discount)
+       //a = prompt ("enter your value:")
+       // if (a % 2 == 0){
+         //  console.log("Enter value is even")
+       //}
+       //category = prompt ("enter your category:")
+        //if (category == "human"){
+           // document.write(`YOU ARE THE ${category} welcome to the dshboard and utilise the fatures`)
+      //  }
+        //else{
+           // document.write(`YOU ARE THE ${category} you are not a human,not able to access`)
+       // }
+    //    password = prompt("enter your password:")
+    //    confirmpassword = prompt("confirm your password:")
+    //    if(password == confirmpassword) {
+    //     alert("your password is correct")
+    // }
+    // else{
+    //     alert("your password is incorrect")
+    // }
+    //looping statements
+    // a = prompt("Enter the value below 20")
+    // for(i=a;i<20;i++)
+    // {
+    //     document.write (`<br>${i}</br>`)
+    // }
+//    a=prompt("enter the value:") 
+//    while(a<=10){
+//         document.write(a)
+//         a++
+//     }
+//function keyword
+//
+    // a= Number (prompt("enter value of a:"))
+    // b = Number (prompt("enter value of b:"))
+    // function add(){
+    //     //scope/block
+    //  alert(`the sum of a and b is ${a+b}`)
+    // }
+    // add()
+    function a()
+    {
+         a = Number (prompt ("enter the value of a:"))
+        alert(`the entered value a is: ${a}`)
+        
+    }
+    function b()
+    {
+         b = Number (prompt ("enter the value of b:"))
+        alert(`the entered value b is ${b}`)
+    }
+    function add()
+    {
+        alert(`the sum of a and b is ${a+b}`)
+    }
+
     </script>
 </head>
 <body>
-    <script>
+   <button onclick="a()">a</button>
+   <button onclick="b()">b</button>
+   <button onclick="add()">+</button>
+   
 
-    </script>
 </body>
 </html>

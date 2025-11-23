@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>AI Career Recommendation System</title>
+    <style>
+        :root{--bg:#0f1722;--card:#0b1220;--accent:#5eead4;--muted:#9ca3af;color-scheme:dark}
+        *{box-sizing:border-box;font-family:Inter,ui-sans-serif,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial}
+        body{margin:0;background:linear-gradient(180deg,#071023 0%, #081127 60%);color:#e6eef6;min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px}
+        .container{width:100%;max-width:980px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border:1px solid rgba(255,255,255,0.03);padding:22px;border-radius:12px;box-shadow:0 8px 30px rgba(2,6,23,0.7)}
+        h1{margin:4px 0 12px;font-size:20px}
+        p.lead{margin:0 0 18px;color:var(--muted);font-size:13px}
+        .grid{display:grid;grid-template-columns:1fr 360px;gap:18px}
+        .card{background:var(--card);padding:14px;border-radius:10px;border:1px solid rgba(255,255,255,0.02)}
+        label{display:block;font-size:13px;margin-bottom:8px}
+        .row{display:flex;gap:8px;margin-bottom:12px;align-items:center}
+        input[type="range"]{width:100%}
+        select,input[type="number"]{width:100%;padding:8px;border-radius:6px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit}
+        .chips{display:flex;flex-wrap:wrap;gap:8px}
+        .chip{padding:8px 10px;border-radius:999px;background:rgba(255,255,255,0.02);cursor:pointer;border:1px solid rgba(255,255,255,0.02);font-size:13px}
+        .chip.active{background:linear-gradient(90deg,#052f2a,#07383a);border-color:rgba(94,234,212,0.14);box-shadow:0 6px 18px rgba(94,234,212,0.03)}
+        button{background:linear-gradient(90deg,var(--accent),#34d399);border:none;color:#042022;padding:10px 14px;border-radius:8px;font-weight:600;cursor:pointer}
+        .secondary{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted);padding:8px 12px}
+        .result{max-height:560px;overflow:auto}
+        .career{padding:10px;border-radius:8px;margin-bottom:10px;background:linear-gradient(180deg,rgba(255,255,255,0.01),transparent);border:1px solid rgba(255,255,255,0.02)}
+        .small{font-size:12px;color:var(--muted)}
+        pre{white-space:pre-wrap;font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,monospace;background:transparent;border-radius:6px;padding:8px}
+        footer{margin-top:14px;font-size:12px;color:var(--muted);text-align:center}
+        @media (max-width:880px){.grid{grid-template-columns:1fr;}.container{padding:16px}}
+    </style>
+</head>
+<body>
+    <div class="container" role="main">
+        <h1>AI Career Recommendation System</h1>
+        <p class="lead">Answer a few quick questions and get personalized AI career suggestions, explanations, and learning roadmaps.</p>
+
+        <div class="grid">
+            <div class="card">
+                <form id="profileForm" onsubmit="return false;">
+                    <label>Years of programming / ML experience
+                        <input id="years" type="number" min="0" max="40" value="1" />
+                    </label>
+
+                    <label>Programming skill (0 = beginner, 10 = expert)
+                        <input id="prog" type="range" min="0" max="10" value="5" />
+                        <div class="small" id="progVal">5</div>
+                    </label>
+
+                    <label>Mathematics skill (linear algebra, calculus)
+                        <input id="math" type="range" min="0" max="10" value="5" />
+                        <div class="small" id="mathVal">5</div>
+                    </label>
+
+                    <label>Statistics & data analysis
+                        <input id="stats" type="range" min="0" max="10" value="5" />
+                        <div class="small" id="statsVal">5</div>
+                    </label>
+
+                    <label>Preferred AI domains (choose up to 3)</label>
+                    <div class="chips" id="domains">
+                        <div class="chip" data-value="cv">Computer Vision</div>
+                        <div class="chip" data-value="nlp">NLP / Language</div>
+                        <div class="chip" data-value="rl">Reinforcement Learning</div>
+                        <div class="chip" data-value="data">Data / Analytics</div>
+                        <div class="chip" data-value="ops">MLOps / Infra</div>
+                        <div class="chip" data-value="robotics">Robotics</div>
+                        <div class="chip" data-value="research">Research / Theory</div>
+                    </div>
+
+                    <label>What motivates you? (pick one)</label>
+                    <div class="chips" id="motives">
+                        <div class="chip" data-value="impact">Impact / products</div>
+                        <div class="chip" data-value="science">Science / Publications</div>
+                        <div class="chip" data-value="scale">Scale / Systems</div>
+                        <div class="chip" data-value="design">Product / UX</div>
+                    </div>
+
+                    <label>Time to reskill / learn (hours per week)</label>
+                    <input id="time" type="range" min="1" max="40" value="8" />
+                    <div class="small" id="timeVal">8 hrs / week</div>
+
+                    <div style="display:flex;gap:8px;margin-top:12px">
+                        <button id="recommendBtn">Get Recommendations</button>
+                        <button id="clearBtn" class="secondary" type="button">Reset</button>
+                    </div>
+                </form>
+            </div>
+
+            <div class="card result">
+                <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+                    <strong>Recommendations</strong>
+                    <div style="display:flex;gap:8px">
+                        <button id="copyBtn" class="secondary" type="button">Copy</button>
+                        <button id="downloadBtn" class="secondary" type="button">Download</button>
+                    </div>
+                </div>
+                <div id="output" aria-live="polite">
+                    <p class="small">Fill the form and press "Get Recommendations".</p>
+                </div>
+            </div>
+        </div>
+
+        <footer>Simple front-end prototype • Gives suggestions and learning steps (no AI backend)</footer>
+    </div>
+
+<script>
+    // Simple AI career recommendation logic (front-end only)
+    const prog = document.getElementById('prog');
+    const math = document.getElementById('math');
+    const stats = document.getElementById('stats');
+    const years = document.getElementById('years');
+    const time = document.getElementById('time');
+    const progVal = document.getElementById('progVal');
+    const mathVal = document.getElementById('mathVal');
+    const statsVal = document.getElementById('statsVal');
+    const timeVal = document.getElementById('timeVal');
+
+    prog.addEventListener('input', ()=> progVal.textContent = prog.value);
+    math.addEventListener('input', ()=> mathVal.textContent = math.value);
+    stats.addEventListener('input', ()=> statsVal.textContent = stats.value);
+    time.addEventListener('input', ()=> timeVal.textContent = time.value + ' hrs / week');
+
+    // chips logic (select up to 3 for domains; single select for motives)
+    function setupChips(parentId, max = 3, single=false) {
+        const p = document.getElementById(parentId);
+        p.querySelectorAll('.chip').forEach(chip=>{
+            chip.addEventListener('click', ()=>{
+                if (single) {
+                    p.querySelectorAll('.chip').forEach(c=>c.classList.remove('active'));
+                    chip.classList.add('active');
+                } else {
+                    const active = p.querySelectorAll('.chip.active').length;
+                    if (!chip.classList.contains('active') && active >= max) {
+                        // allow toggle off
+                        return;
+                    }
+                    chip.classList.toggle('active');
+                }
+            });
+        });
+    }
+    setupChips('domains', 3, false);
+    setupChips('motives', 1, true);
+
+    const careers = [
+        {id:'ml_engineer', name:'Machine Learning Engineer', desc:'Build and deploy ML models in production; focus on software, pipelines, and model performance.'},
+        {id:'data_scientist', name:'Data Scientist', desc:'Analyze data, build models, extract insights, and communicate results to stakeholders.'},
+        {id:'research_scientist', name:'Research Scientist', desc:'Investigate new algorithms, publish papers, and advance theory in ML/AI.'},
+        {id:'nlp_engineer', name:'NLP Engineer', desc:'Work on language models, text processing, and conversational systems.'},
+        {id:'cv_engineer', name:'Computer Vision Engineer', desc:'Work on image/video models, detection, segmentation, and visual reasoning.'},
+        {id:'mlops_engineer', name:'MLOps / Infrastructure Engineer', desc:'Focus on model deployment, reliability, scaling, monitoring, and data pipelines.'},
+        {id:'data_engineer', name:'Data Engineer', desc:'Design and maintain data pipelines, warehouses, ETL, and data infrastructure.'},
+        {id:'ai_pm', name:'AI Product Manager', desc:'Define product strategy, bridge teams, and shape AI product features and roadmaps.'}
+    ];
+
+    function getSelectedChips(id) {
+        return Array.from(document.getElementById(id).querySelectorAll('.chip.active')).map(c=>c.dataset.value);
+    }
+
+    function scoreProfile() {
+        // normalize inputs 0..1
+        const p = +prog.value / 10;
+        const m = +math.value / 10;
+        const s = +stats.value / 10;
+        const yrs = Math.min(+years.value, 20) / 20;
+        const t = Math.min(+time.value, 40) / 40;
+        const domains = getSelectedChips('domains');
+        const motive = getSelectedChips('motives')[0] || null;
+
+        // base scoring weights per career
+        const base = {};
+        careers.forEach(c => base[c.id] = 0);
+
+        // heuristics: increase scores by weighted sum
+        base['ml_engineer'] += p*0.5 + m*0.2 + s*0.1 + yrs*0.1 + t*0.1;
+        base['data_scientist'] += s*0.45 + p*0.25 + yrs*0.15 + m*0.1;
+        base['research_scientist'] += m*0.45 + s*0.15 + p*0.15 + yrs*0.15;
+        base['nlp_engineer'] += p*0.4 + m*0.2 + s*0.15 + yrs*0.1;
+        base['cv_engineer'] += p*0.4 + m*0.25 + s*0.1 + yrs*0.1;
+        base['mlops_engineer'] += p*0.5 + yrs*0.2 + t*0.1;
+        base['data_engineer'] += p*0.6 + yrs*0.15;
+        base['ai_pm'] += yrs*0.2 + t*0.05 + (p*0.15 + s*0.2)*0.5;
+
+        // domain boosts
+        domains.forEach(d=>{
+            if (d==='cv') { base['cv_engineer'] += 0.35; base['ml_engineer'] += 0.15; }
+            if (d==='nlp') { base['nlp_engineer'] += 0.35; base['ml_engineer'] += 0.15; }
+            if (d==='rl') { base['research_scientist'] += 0.25; base['ml_engineer'] += 0.2; }
+            if (d==='data') { base['data_scientist'] += 0.3; base['data_engineer'] += 0.25; }
+            if (d==='ops') { base['mlops_engineer'] += 0.45; base['data_engineer'] += 0.15; }
+            if (d==='robotics') { base['research_scientist'] += 0.2; base['ml_engineer'] += 0.25; }
+            if (d==='research') { base['research_scientist'] += 0.45; }
+        });
+
+        // motive adjustments
+        if (motive === 'science') { base['research_scientist'] += 0.3; }
+        if (motive === 'impact') { base['ml_engineer'] += 0.15; base['ai_pm'] += 0.15; }
+        if (motive === 'scale') { base['mlops_engineer'] += 0.25; base['data_engineer'] += 0.15; }
+        if (motive === 'design') { base['ai_pm'] += 0.25; base['data_scientist'] += 0.1; }
+
+        // small randomness to break ties (deterministic using inputs)
+        const seed = (p + m + s + yrs + t + domains.length) * 1000;
+        Object.keys(base).forEach((k,i)=>{
+            base[k] += ((Math.sin(seed + i*13) + 1) * 0.005);
+        });
+
+        return base;
+    }
+
+    function generateRecommendation() {
+        const yearsVal = +years.value;
+        const timePerWeek = +time.value;
+        const scores = scoreProfile();
+        const ranked = Object.keys(scores).map(id=>({id, score:scores[id]}))
+            .sort((a,b)=>b.score - a.score);
+
+        const top = ranked.slice(0,3).map(r => {
+            const info = careers.find(c=>c.id===r.id);
+            return {id: r.id, name: info.name, score: r.score, desc: info.desc};
+        });
+
+        // build output HTML
+        const out = document.getElementById('output');
+        out.innerHTML = '';
+        top.forEach((tcareer, idx) => {
+            const el = document.createElement('div');
+            el.className = 'career';
+            el.innerHTML = `
+                <div style="display:flex;justify-content:space-between;align-items:center">
+                    <strong>${idx+1}. ${tcareer.name}</strong>
+                    <div class="small">match ${(tcareer.score*10).toFixed(1)}/10</div>
+                </div>
+                <div class="small" style="margin-top:6px">${tcareer.desc}</div>
+            `;
+            // Add tailored roadmap
+            const roadmap = generateRoadmap(tcareer.id, yearsVal, timePerWeek);
+            const list = document.createElement('div');
+            list.style.marginTop = '10px';
+            list.innerHTML = `<strong class="small">Suggested roadmap</strong>`;
+            const ul = document.createElement('ol');
+            ul.style.paddingLeft = '18px';
+            ul.style.marginTop = '8px';
+            roadmap.forEach(step=>{
+                const li = document.createElement('li');
+                li.style.marginBottom = '6px';
+                li.innerHTML = `<span class="small">${step}</span>`;
+                ul.appendChild(li);
+            });
+            list.appendChild(ul);
+            el.appendChild(list);
+            out.appendChild(el);
+        });
+
+        // add general resources
+        const resources = document.createElement('div');
+        resources.className = 'small';
+        resources.style.marginTop = '8px';
+        resources.innerHTML = `<strong>Resources</strong>
+            <ul style="padding-left:18px;margin-top:8px">
+                <li>fast.ai Practical Deep Learning for Coders — https://course.fast.ai</li>
+                <li>Andrew Ng's ML & Deep Learning Specializations — https://www.coursera.org</li>
+                <li>Kaggle Micro-courses & Competitions — https://www.kaggle.com/learn</li>
+                <li>CS231n (Vision), CS224n (NLP) lecture notes & assignments (Stanford)</li>
+            </ul>`;
+        out.appendChild(resources);
+
+        // attach a json summary to the output for copy/download
+        out.dataset.payload = JSON.stringify({
+            profile: {
+                years: +years.value, prog: +prog.value, math: +math.value, stats: +stats.value,
+                domains: getSelectedChips('domains'), motive: getSelectedChips('motives'),
+                timePerWeek: +time.value
+            },
+            recommendations: top
+        }, null, 2);
+    }
+
+    function generateRoadmap(id, years, hoursPerWeek) {
+        // heuristics for roadmap steps
+        const weeks = Math.max(1, Math.round((200 / Math.max(1, hoursPerWeek)))); // rough months estimate
+        const roadmap = [];
+        if (id === 'ml_engineer') {
+            roadmap.push('Strengthen software engineering: Python, testing, containers (Docker).');
+            roadmap.push('Master ML frameworks: scikit-learn, PyTorch or TensorFlow.');
+            roadmap.push('Learn model deployment: REST APIs, Docker, CI/CD, basic Kubernetes.');
+            roadmap.push('Build 2-3 end-to-end projects and deploy them.');
+            roadmap.push('Practice system design for ML and observability (monitoring, metrics).');
+        } else if (id === 'data_scientist') {
+            roadmap.push('Solidify stats and EDA: hypothesis testing, A/B testing, feature engineering.');
+            roadmap.push('Practice SQL and data wrangling at scale.');
+            roadmap.push('Build and evaluate models: regression, tree-based models, interpretable ML.');
+            roadmap.push('Communicate results: dashboards (Streamlit, Dash), visualization.');
+            roadmap.push('Contribute to a domain project or Kaggle competition.');
+        } else if (id === 'research_scientist') {
+            roadmap.push('Deep dive into math: linear algebra, probability, optimization.');
+            roadmap.push('Read and re-implement papers; maintain a notes & reproducibility repo.');
+            roadmap.push('Master PyTorch and training large models; experiment design.');
+            roadmap.push('Publish small experiments and collaborate with researchers.');
+            roadmap.push('Consider grad programs or internships at research labs.');
+        } else if (id === 'nlp_engineer') {
+            roadmap.push('Study NLP fundamentals: tokenization, embeddings, sequence models.');
+            roadmap.push('Learn modern transformers: Hugging Face + fine-tuning workflows.');
+            roadmap.push('Build projects: chatbots, summarizers, question-answering systems.');
+            roadmap.push('Deploy language models responsibly: safety, bias, evaluation metrics.');
+            roadmap.push('Explore domain-specific corpora and evaluation pipelines.');
+        } else if (id === 'cv_engineer') {
+            roadmap.push('Learn image basics: convolution, data augmentation, transfer learning.');
+            roadmap.push('Explore detection/segmentation models (Faster R-CNN, U-Net).');
+            roadmap.push('Practice with datasets (COCO, Pascal VOC) and evaluation metrics.');
+            roadmap.push('Build real projects: OCR, detection, or video analytics; optimize inference.');
+            roadmap.push('Understand hardware constraints and model compression (pruning, quant).');
+        } else if (id === 'mlops_engineer') {
+            roadmap.push('Learn infra fundamentals: Docker, Kubernetes, CI/CD and cloud basics.');
+            roadmap.push('Study model deployment patterns: canary, shadow, batch vs online.');
+            roadmap.push('Implement monitoring, logging, and retraining pipelines.');
+            roadmap.push('Practice infra-as-code and orchestration (Terraform, Airflow, Kubeflow).');
+            roadmap.push('Work on reliability, cost optimization, and SLA-driven design.');
+        } else if (id === 'data_engineer') {
+            roadmap.push('Master SQL and data modeling; learn ETL/ELT patterns.');
+            roadmap.push('Work with streaming and batch systems (Kafka, Spark).');
+            roadmap.push('Build data warehouses and pipelines; understand orchestration tools.');
+            roadmap.push('Ensure data quality, lineage, and governance basics.');
+            roadmap.push('Create production-ready pipelines with testing and monitoring.');
+        } else if (id === 'ai_pm') {
+            roadmap.push('Learn AI capabilities and limitations; read applied case studies.');
+            roadmap.push('Work on stakeholder communication, product metrics, and prioritization.');
+            roadmap.push('Practice defining ML problem specs, success metrics, and data requirements.');
+            roadmap.push('Collaborate on a cross-functional project to ship an AI-powered feature.');
+            roadmap.push('Study responsible AI, compliance, and adoption strategies.');
+        }
+        // estimate a commitment note
+        roadmap.push(`Estimated ramp-up: ~${weeks} weeks at ${hoursPerWeek} hrs/week (approx).`);
+        return roadmap;
+    }
+
+    document.getElementById('recommendBtn').addEventListener('click', ()=>{
+        generateRecommendation();
+    });
+
+    document.getElementById('clearBtn').addEventListener('click', ()=>{
+        document.getElementById('profileForm').reset();
+        progVal.textContent = prog.value = 5;
+        mathVal.textContent = math.value = 5;
+        statsVal.textContent = stats.value = 5;
+        years.value = 1;
+        time.value = 8;
+        timeVal.textContent = '8 hrs / week';
+        document.querySelectorAll('.chip.active').forEach(c=>c.classList.remove('active'));
+        document.getElementById('output').innerHTML = '<p class="small">Fill the form and press "Get Recommendations".</p>';
+        delete document.getElementById('output').dataset.payload;
+    });
+
+    document.getElementById('copyBtn').addEventListener('click', async ()=>{
+        const out = document.getElementById('output');
+        const payload = out.dataset.payload;
+        if (!payload) return alert('No recommendation to copy.');
+        try {
+            await navigator.clipboard.writeText(payload);
+            alert('Recommendation copied to clipboard.');
+        } catch {
+            prompt('Copy the JSON below:', payload);
+        }
+    });
+
+    document.getElementById('downloadBtn').addEventListener('click', ()=>{
+        const out = document.getElementById('output');
+        const payload = out.dataset.payload;
+        if (!payload) return alert('No recommendation to download.');
+        const blob = new Blob([payload], {type:'application/json'});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'ai-career-recommendation.json';
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+    });
+
+    // Initialize a couple default active chips
+    document.querySelector('.chip[data-value="data"]').classList.add('active');
+    document.querySelector('.chip[data-value="impact"]').classList.add('active');
+</script>
+</body>
+</html>
